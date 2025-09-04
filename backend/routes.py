@@ -175,7 +175,7 @@ def get_balances():
     balances = defaultdict(float)
     friends = {f.id: f for f in Friend.query.all()}
 
-    # --- Corrected Trip Calculation Logic ---
+    # This part was correct: Calculate balances from trips
     for trip in Trip.query.all():
         if not trip.participants:
             continue
@@ -183,28 +183,22 @@ def get_balances():
                            for p in trip.participants)
         if total_weight == 0:
             continue
-
         cost_per_share = trip.total_cost / total_weight
-
-        # Add what the driver paid
         balances[trip.driver_id] += trip.total_cost
-
-        # Subtract each participant's share from their balance
         for p in trip.participants:
             balances[p.friend_id] -= direction_weight(
                 p.direction) * cost_per_share
 
-    # --- Payment processing (this part was actually correct before) ---
+    # --- This is the corrected payment logic ---
     for payment in Payment.query.all():
-        balances[payment.from_friend_id] += payment.amount
-        balances[payment.to_friend_id] -= payment.amount
+        balances[payment.from_friend_id] -= payment.amount
+        balances[payment.to_friend_id] += payment.amount
 
     # Using a small tolerance for floating point inaccuracies
     debtors = {id: b for id, b in balances.items() if b < -0.01}
     creditors = {id: b for id, b in balances.items() if b > 0.01}
 
     debts = []
-    # The rest of the function remains the same...
     for debtor_id, debtor_balance in sorted(debtors.items()):
         amount_owed = abs(debtor_balance)
         for creditor_id, creditor_balance in sorted(creditors.items()):
