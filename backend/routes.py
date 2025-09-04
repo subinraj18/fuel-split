@@ -322,15 +322,3 @@ def delete_car(car_id):
     db.session.commit()
     return jsonify({"message": "deleted"}), 200
 # Add this function to your backend/routes.py file
-
-
-@app.route("/reset-database-for-real")
-def reset_database():
-    try:
-        # This drops all tables from the database
-        db.drop_all()
-        # This recreates all tables based on your models
-        db.create_all()
-        return "Database has been reset successfully!", 200
-    except Exception as e:
-        return f"An error occurred: {e}", 500
