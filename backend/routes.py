@@ -176,22 +176,22 @@ def get_balances():
     friends = {f.id: f for f in Friend.query.all()}
 
     for trip in Trip.query.all():
-        # Create a temporary list of all people involved in the cost-sharing
+        # Create a temporary list of all people involved in cost-sharing for this trip
         all_involved = list(trip.participants)
 
-        # Check if the driver is already listed as a participant
+        # Check if the driver is already listed as a participant for this trip
         driver_is_participant = any(
             p.friend_id == trip.driver_id for p in all_involved)
 
         # If the driver is not in the participants list, add them.
-        # This ensures the driver's share is always included in the calculation.
-        # We assume the driver's participation is a 'round' trip.
+        # This is the critical step to ensure the driver's share is always included.
         if not driver_is_participant:
+            # We create a temporary object to represent the driver's participation
             driver_participation = SimpleNamespace(
                 friend_id=trip.driver_id, direction='round')
             all_involved.append(driver_participation)
 
-        # Calculate total weight based on everyone involved (driver + participants)
+        # Now, calculate the total weight based on everyone involved (driver + participants)
         total_weight = sum(direction_weight(p.direction) for p in all_involved)
 
         if total_weight == 0:
@@ -199,25 +199,25 @@ def get_balances():
 
         cost_per_share = trip.total_cost / total_weight
 
-        # Credit the driver for paying the full amount upfront
+        # 1. Credit the driver for paying the full amount upfront
         balances[trip.driver_id] += trip.total_cost
 
-        # Debit each person for their respective share
+        # 2. Debit each person for their respective share of the cost
         for p in all_involved:
             balances[p.friend_id] -= direction_weight(
                 p.direction) * cost_per_share
 
-    # Process any payments that have been made
+    # This section correctly processes payments to settle debts
     for payment in Payment.query.all():
         balances[payment.from_friend_id] += payment.amount
         balances[payment.to_friend_id] -= payment.amount
 
-    # Filter into debtors and creditors, ignoring negligible amounts
+    # Filter into debtors and creditors, using a tolerance for floating point math
     debtors = {id: b for id, b in balances.items() if b < -0.01}
     creditors = {id: b for id, b in balances.items() if b > 0.01}
 
     debts = []
-    # Settle debts between debtors and creditors
+    # This loop correctly calculates who owes what to whom
     for debtor_id, debtor_balance in sorted(debtors.items()):
         amount_owed = abs(debtor_balance)
         for creditor_id, creditor_balance in sorted(creditors.items()):
