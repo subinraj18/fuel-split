@@ -185,28 +185,15 @@ def get_balances():
         for p in trip.participants:
             balances[p.friend_id] -= direction_weight(
                 p.direction) * cost_per_share
+
+    # Corrected payment logic
     for payment in Payment.query.all():
-        balances[payment.from_friend_id] += payment.amount
-        balances[payment.to_friend_id] -= payment.amount
+        balances[payment.from_friend_id] -= payment.amount
+        balances[payment.to_friend_id] += payment.amount
+
     debtors = {id: b for id, b in balances.items() if b < 0}
     creditors = {id: b for id, b in balances.items() if b > 0}
     debts = []
-    for debtor_id, debtor_balance in sorted(debtors.items()):
-        amount_owed = abs(debtor_balance)
-        for creditor_id, creditor_balance in sorted(creditors.items()):
-            if amount_owed <= 0.01:
-                break
-            if creditor_balance <= 0.01:
-                continue
-            can_pay = min(amount_owed, creditor_balance)
-            debts.append({
-                "from_id": debtor_id, "from_name": friends[debtor_id].name,
-                "to_id": creditor_id, "to_name": friends[creditor_id].name,
-                "amount": round(can_pay, 2)
-            })
-            amount_owed -= can_pay
-            creditors[creditor_id] -= can_pay
-    return jsonify(debts), 200
 
 
 @app.route("/expenses", methods=["GET"])
