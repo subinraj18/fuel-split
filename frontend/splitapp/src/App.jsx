@@ -1,79 +1,47 @@
-import { useEffect, useState } from "react";
-import Login from "./components/Login";
+import { useEffect, useState, useCallback } from "react";
 import TripForm from "./components/TripForm";
 import TripList from "./components/TripList";
 import FriendManager from "./components/FriendManager";
 import CarManager from "./components/CarManager";
 import Settings from "./components/Settings";
-import TripBreakdown from "./components/TripBreakdown";
+import BalanceDashboard from "./components/BalanceDashboard";
 import ExpenseReport from "./components/ExpenseReport";
 import "./App.css";
 
 function App() {
-  // State for authentication
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // State for application data
   const [trips, setTrips] = useState([]);
   const [friends, setFriends] = useState([]);
   const [cars, setCars] = useState([]);
   const [petrolPrice, setPetrolPrice] = useState(0);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
 
-  // This useEffect will now only run AFTER authentication is successful
-  useEffect(() => {
-    // Don't fetch data if the user is not logged in
-    if (!isAuthenticated) {
-      return;
-    }
+  const fetchData = useCallback(async (endpoint, setter) => {
+    try {
+      const response = await fetch(`${API_URL}/${endpoint}`);
+      const data = await response.json();
 
-    const fetchData = async () => {
-      try {
-        const [tripsRes, friendsRes, carsRes, priceRes] = await Promise.all([
-          fetch(`${API_URL}/trips`),
-          fetch(`${API_URL}/friends`),
-          fetch(`${API_URL}/cars`),
-          fetch(`${API_URL}/settings/petrol_price`),
-        ]);
-
-        const tripsData = await tripsRes.json();
-        const friendsData = await friendsRes.json();
-        const carsData = await carsRes.json();
-        const priceData = await priceRes.json();
-
-        setTrips(tripsData || []);
-        setFriends(friendsData || []);
-        setCars(carsData || []);
-        setPetrolPrice(priceData.price || 0);
-      } catch (err) {
-        console.error("Error fetching data:", err);
+      if (endpoint === 'settings/petrol_price') {
+        setter(data.price || 0);
+      } else {
+        setter(data || []);
       }
-    };
-
-    fetchData();
-    // It now depends on isAuthenticated and refreshKey
-  }, [isAuthenticated, API_URL, refreshKey]);
-
-  const handleDataChanged = () => {
-    setRefreshKey(oldKey => oldKey + 1);
-  };
-
-  const handleLogin = (password) => {
-    if (password === "fuel") {
-      setIsAuthenticated(true);
-    } else {
-      alert("Incorrect password!");
+    } catch (err) {
+      console.error(`Error fetching ${endpoint}:`, err);
     }
-  };
+  }, [API_URL]);
 
-  // If not authenticated, render the Login screen
-  if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
-  }
+  const handleDataChanged = useCallback(() => {
+    fetchData("trips", setTrips);
+    fetchData("friends", setFriends);
+    fetchData("cars", setCars);
+    fetchData("settings/petrol_price", setPetrolPrice);
+  }, [fetchData]);
 
-  // Once authenticated, render the main application
+  useEffect(() => {
+    handleDataChanged();
+  }, [handleDataChanged]);
+
   return (
     <div className="app">
       <h1>🚗 FuelFlow</h1>
@@ -83,7 +51,7 @@ function App() {
           <TripList trips={trips} />
         </div>
         <div className="right-panel">
-          <TripBreakdown trips={trips} onDataChanged={handleDataChanged} />
+          <BalanceDashboard trips={trips} onDataChanged={handleDataChanged} />
           <ExpenseReport />
           <Settings petrolPrice={petrolPrice} onPriceChanged={handleDataChanged} />
           <CarManager cars={cars} onCarsChanged={handleDataChanged} />
