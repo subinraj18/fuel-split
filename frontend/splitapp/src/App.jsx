@@ -14,14 +14,15 @@ function App() {
   const [cars, setCars] = useState([]);
   const [petrolPrice, setPetrolPrice] = useState(0);
 
-  const API_URL = "http://127.0.0.1:5000";
+  // This is the corrected line. It uses the Vercel variable when deployed,
+  // but falls back to localhost for local development.
+  const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
 
   const fetchData = useCallback(async (endpoint, setter) => {
     try {
       const response = await fetch(`${API_URL}/${endpoint}`);
       const data = await response.json();
 
-      // Special handling for the petrol price object
       if (endpoint === 'settings/petrol_price') {
         setter(data.price || 0);
       } else {
@@ -30,7 +31,7 @@ function App() {
     } catch (err) {
       console.error(`Error fetching ${endpoint}:`, err);
     }
-  }, []);
+  }, [API_URL]); // Add API_URL as a dependency
 
   const handleDataChanged = useCallback(() => {
     fetchData("trips", setTrips);
