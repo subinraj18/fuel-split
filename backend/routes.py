@@ -8,15 +8,6 @@ from datetime import datetime
 ALLOWED_DIRECTIONS = {"round", "morning", "evening"}
 
 
-@app.route("/create-tables-for-prod")
-def create_tables():
-    try:
-        db.create_all()
-        return "Tables created successfully!", 200
-    except Exception as e:
-        return f"An error occurred: {e}", 500
-
-
 def direction_weight(direction: str) -> float:
     if direction == "round":
         return 2.0
