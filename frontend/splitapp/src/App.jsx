@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-// --- Import the required components ---
+import { useEffect, useState, useCallback } from "react";
+// --- Import All Your Components ---
 import Login from "./components/Login";
 import TripForm from "./components/TripForm";
 import TripList from "./components/TripList";
@@ -7,7 +7,7 @@ import FriendManager from "./components/FriendManager";
 import CarManager from "./components/CarManager";
 import Settings from "./components/Settings";
 import ExpenseReport from "./components/ExpenseReport";
-import TripBreakdown from "./components/TripBreakdown"; // Using TripBreakdown
+import TripBreakdown from "./components/TripBreakdown";
 import "./App.css";
 
 function App() {
@@ -19,9 +19,31 @@ function App() {
   const [friends, setFriends] = useState([]);
   const [cars, setCars] = useState([]);
   const [petrolPrice, setPetrolPrice] = useState(0);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
+
+  const fetchData = useCallback(async () => {
+    try {
+      const [tripsRes, friendsRes, carsRes, priceRes] = await Promise.all([
+        fetch(`${API_URL}/trips`),
+        fetch(`${API_URL}/friends`),
+        fetch(`${API_URL}/cars`),
+        fetch(`${API_URL}/settings/petrol_price`),
+      ]);
+
+      const tripsData = await tripsRes.json();
+      const friendsData = await friendsRes.json();
+      const carsData = await carsRes.json();
+      const priceData = await priceRes.json();
+
+      setTrips(tripsData || []);
+      setFriends(friendsData || []);
+      setCars(carsData || []);
+      setPetrolPrice(priceData.price || 0);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  }, [API_URL]);
 
   // This useEffect will now only run AFTER authentication is successful
   useEffect(() => {
@@ -29,37 +51,8 @@ function App() {
     if (!isAuthenticated) {
       return;
     }
-
-    const fetchData = async () => {
-      try {
-        const [tripsRes, friendsRes, carsRes, priceRes] = await Promise.all([
-          fetch(`${API_URL}/trips`),
-          fetch(`${API_URL}/friends`),
-          fetch(`${API_URL}/cars`),
-          fetch(`${API_URL}/settings/petrol_price`),
-        ]);
-
-        const tripsData = await tripsRes.json();
-        const friendsData = await friendsRes.json();
-        const carsData = await carsRes.json();
-        const priceData = await priceRes.json();
-
-        setTrips(tripsData || []);
-        setFriends(friendsData || []);
-        setCars(carsData || []);
-        setPetrolPrice(priceData.price || 0);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      }
-    };
-
     fetchData();
-    // It now depends on isAuthenticated and refreshKey
-  }, [isAuthenticated, API_URL, refreshKey]);
-
-  const handleDataChanged = () => {
-    setRefreshKey(oldKey => oldKey + 1);
-  };
+  }, [isAuthenticated, fetchData]);
 
   const handleLogin = (password) => {
     if (password === "fuel") {
@@ -80,16 +73,15 @@ function App() {
       <h1>🚗 FuelFlow</h1>
       <div className="main-content">
         <div className="left-panel">
-          <TripForm friends={friends} cars={cars} onTripAdded={handleDataChanged} />
+          <TripForm friends={friends} cars={cars} onTripAdded={fetchData} />
           <TripList trips={trips} />
         </div>
         <div className="right-panel">
-          {/* Using the correct TripBreakdown component */}
-          <TripBreakdown trips={trips} onDataChanged={handleDataChanged} />
+          <TripBreakdown trips={trips} onDataChanged={fetchData} />
           <ExpenseReport />
-          <Settings petrolPrice={petrolPrice} onPriceChanged={handleDataChanged} />
-          <CarManager cars={cars} onCarsChanged={handleDataChanged} />
-          <FriendManager friends={friends} onFriendsChanged={handleDataChanged} />
+          <Settings petrolPrice={petrolPrice} onPriceChanged={fetchData} />
+          <CarManager cars={cars} onCarsChanged={fetchData} />
+          <FriendManager friends={friends} onFriendsChanged={fetchData} />
         </div>
       </div>
     </div>
