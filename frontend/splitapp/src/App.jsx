@@ -1,60 +1,45 @@
-// Corrected code for frontend/splitapp/src/App.jsx
 import { useEffect, useState } from "react";
+// Import the new Login component
+import Login from "./components/Login";
 import TripForm from "./components/TripForm";
 import TripList from "./components/TripList";
 import FriendManager from "./components/FriendManager";
 import CarManager from "./components/CarManager";
 import Settings from "./components/Settings";
-import BalanceDashboard from "./components/BalanceDashboard";
-import ExpenseReport from "./components/ExpenseReport";
 import TripBreakdown from "./components/TripBreakdown";
+import ExpenseReport from "./components/ExpenseReport";
 import "./App.css";
 
 function App() {
+  // 1. Add state to track if the user is authenticated
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   const [trips, setTrips] = useState([]);
   const [friends, setFriends] = useState([]);
   const [cars, setCars] = useState([]);
   const [petrolPrice, setPetrolPrice] = useState(0);
-  const [refreshKey, setRefreshKey] = useState(0); // Add a refresh key
 
   const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [
-          tripsRes,
-          friendsRes,
-          carsRes,
-          priceRes
-        ] = await Promise.all([
-          fetch(`${API_URL}/trips`),
-          fetch(`${API_URL}/friends`),
-          fetch(`${API_URL}/cars`),
-          fetch(`${API_URL}/settings/petrol_price`),
-        ]);
+  const fetchData = () => { /* ... (keep your existing fetchData logic) ... */ };
+  const handleDataChanged = () => { /* ... (keep your existing handleDataChanged logic) ... */ };
+  useEffect(() => { /* ... (keep your existing useEffect logic) ... */ }, []);
 
-        const tripsData = await tripsRes.json();
-        const friendsData = await friendsRes.json();
-        const carsData = await carsRes.json();
-        const priceData = await priceRes.json();
-
-        setTrips(tripsData || []);
-        setFriends(friendsData || []);
-        setCars(carsData || []);
-        setPetrolPrice(priceData.price || 0);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      }
-    };
-    fetchData();
-  }, [API_URL, refreshKey]); // Refetch when refreshKey changes
-
-  const handleDataChanged = () => {
-    setRefreshKey(oldKey => oldKey + 1); // Trigger a refresh
+  // 2. Create a function to handle the login attempt
+  const handleLogin = (password) => {
+    if (password === "fuel") {
+      setIsAuthenticated(true);
+    } else {
+      alert("Incorrect password!");
+    }
   };
 
+  // 3. If not authenticated, show the Login component
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
 
+  // 4. If authenticated, show the main application
   return (
     <div className="app">
       <h1>🚗 FuelFlow</h1>
@@ -64,7 +49,6 @@ function App() {
           <TripList trips={trips} />
         </div>
         <div className="right-panel">
-          {/* 2. Replace BalanceDashboard with the new TripBreakdown component */}
           <TripBreakdown trips={trips} onDataChanged={handleDataChanged} />
           <ExpenseReport />
           <Settings petrolPrice={petrolPrice} onPriceChanged={handleDataChanged} />
