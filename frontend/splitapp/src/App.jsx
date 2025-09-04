@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from "react";
-// --- Import All Your Components ---
 import Login from "./components/Login";
 import TripForm from "./components/TripForm";
 import TripList from "./components/TripList";
@@ -11,7 +10,7 @@ import TripBreakdown from "./components/TripBreakdown";
 import "./App.css";
 
 function App() {
-  // State for authentication
+  // State to track if the user is authenticated
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // State for application data
@@ -30,12 +29,10 @@ function App() {
         fetch(`${API_URL}/cars`),
         fetch(`${API_URL}/settings/petrol_price`),
       ]);
-
       const tripsData = await tripsRes.json();
       const friendsData = await friendsRes.json();
       const carsData = await carsRes.json();
       const priceData = await priceRes.json();
-
       setTrips(tripsData || []);
       setFriends(friendsData || []);
       setCars(carsData || []);
@@ -45,15 +42,14 @@ function App() {
     }
   }, [API_URL]);
 
-  // This useEffect will now only run AFTER authentication is successful
+  // This hook will fetch data ONLY after the user is authenticated
   useEffect(() => {
-    // Don't fetch data if the user is not logged in
-    if (!isAuthenticated) {
-      return;
+    if (isAuthenticated) {
+      fetchData();
     }
-    fetchData();
   }, [isAuthenticated, fetchData]);
 
+  // This function handles the password submission from the Login component
   const handleLogin = (password) => {
     if (password === "fuel") {
       setIsAuthenticated(true);
@@ -62,12 +58,12 @@ function App() {
     }
   };
 
-  // If not authenticated, render the Login screen
+  // If the user is not authenticated, show only the Login page
   if (!isAuthenticated) {
     return <Login onLogin={handleLogin} />;
   }
 
-  // Once authenticated, render the main application
+  // Once authenticated, show the main application
   return (
     <div className="app">
       <h1>🚗 FuelFlow</h1>
