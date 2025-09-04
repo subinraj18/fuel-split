@@ -2,9 +2,7 @@ const TripList = ({ trips }) => {
     return (
         <div className="trip-list">
             <h2>Recent Trips</h2>
-            {trips.length === 0 ? (
-                <p>No trips logged yet.</p>
-            ) : (
+            {trips.length === 0 ? (<p>No trips logged yet.</p>) : (
                 <ul>
                     {trips.map((trip) => (
                         <li key={trip.id} style={{ display: 'block', background: 'none', padding: '10px 0' }}>
@@ -27,5 +25,4 @@ const TripList = ({ trips }) => {
         </div>
     );
 };
-
 export default TripList;

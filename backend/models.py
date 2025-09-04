@@ -2,7 +2,7 @@ from config import db
 
 
 class Friend(db.Model):
-    _tablename_ = "friends"
+    __tablename__ = "friends"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False, unique=True)
 
@@ -11,7 +11,7 @@ class Friend(db.Model):
 
 
 class Car(db.Model):
-    _tablename_ = "cars"
+    __tablename__ = "cars"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False, unique=True)
     mileage = db.Column(db.Float, nullable=False)
@@ -21,13 +21,13 @@ class Car(db.Model):
 
 
 class Setting(db.Model):
-    _tablename_ = "settings"
+    __tablename__ = "settings"
     key = db.Column(db.String(50), primary_key=True)
     value = db.Column(db.String(120), nullable=False)
 
 
 class Trip(db.Model):
-    _tablename_ = "trips"
+    __tablename__ = "trips"
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.String(20), nullable=False)
     total_kms = db.Column(db.Float, nullable=False)
@@ -50,7 +50,7 @@ class Trip(db.Model):
 
 
 class Payment(db.Model):
-    _tablename_ = "payments"
+    __tablename__ = "payments"
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.String(20), nullable=False)
     amount = db.Column(db.Float, nullable=False)
@@ -63,7 +63,7 @@ class Payment(db.Model):
 
 
 class Participation(db.Model):
-    _tablename_ = "participations"
+    __tablename__ = "participations"
     id = db.Column(db.Integer, primary_key=True)
     trip_id = db.Column(db.Integer, db.ForeignKey("trips.id"), nullable=False)
     friend_id = db.Column(db.Integer, db.ForeignKey(

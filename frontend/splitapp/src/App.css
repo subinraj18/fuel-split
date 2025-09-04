@@ -12,8 +12,7 @@ body {
 }
 
 h1,
-h2,
-h3 {
+h2 {
   color: #333;
 }
 
@@ -64,11 +63,13 @@ button:hover {
   gap: 20px;
 }
 
-/* Form Styles */
 .trip-form,
 .friend-manager,
+.car-manager,
+.settings,
 .balance-dashboard,
-.trip-list {
+.trip-list,
+.expense-report {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
@@ -78,7 +79,10 @@ button:hover {
 
 .form-row,
 .add-participant-controls,
-.add-friend-form {
+.add-friend-form,
+.add-car-form,
+.price-control,
+.report-controls {
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
@@ -94,8 +98,10 @@ button:hover {
   font-weight: bold;
 }
 
-.form-group select {
+.form-group select,
+.form-group input {
   width: 100%;
+  box-sizing: border-box;
 }
 
 .participants-section {
@@ -107,14 +113,18 @@ button:hover {
 
 .participant-preview-list,
 .friend-list,
-.balance-dashboard ul {
+.car-list,
+.balance-dashboard ul,
+.report-results ul {
   list-style: none;
   padding: 0;
 }
 
 .participant-preview-list li,
 .friend-list li,
-.balance-dashboard li {
+.car-list li,
+.balance-dashboard li,
+.report-results li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -145,50 +155,16 @@ button:hover {
   background-color: #218838;
 }
 
-.balance-dashboard span {
-  font-weight: bold;
-  color: #28a745;
-}
-
-/* Add this to the end of src/App.css */
-
-.expense-report {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.report-controls {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.report-controls select {
-  flex: 1;
-}
-
-.report-results ul {
-  list-style: none;
-  padding: 0;
-}
-
-.report-results li {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px;
-  background-color: #f9f9f9;
-  border-radius: 4px;
-  margin-bottom: 5px;
-}
-
+.balance-dashboard span,
 .report-results span {
   font-weight: bold;
-  color: #333;
 }
 
-/* Add this to the end of src/App.css */
+.car-list span {
+  color: #666;
+  font-size: 0.9em;
+}
+
 .settle-btn {
   padding: 5px 10px;
   font-size: 0.8rem;

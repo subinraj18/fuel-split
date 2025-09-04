@@ -8,13 +8,10 @@ const TripForm = ({ friends, cars, onTripAdded }) => {
     const [currentParticipants, setCurrentParticipants] = useState([]);
     const [selectedFriendId, setSelectedFriendId] = useState("");
     const [selectedDirection, setSelectedDirection] = useState("round");
-    const API_URL = "http://127.0.0.1:5000";
+    const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
 
     const handleAddParticipant = () => {
-        if (!selectedFriendId) {
-            alert("Please select a friend to add.");
-            return;
-        }
+        if (!selectedFriendId) return alert("Please select a friend to add.");
         const friendToAdd = friends.find(f => f.id === parseInt(selectedFriendId));
         setCurrentParticipants([...currentParticipants, {
             friendId: friendToAdd.id,
@@ -26,47 +23,28 @@ const TripForm = ({ friends, cars, onTripAdded }) => {
     };
 
     const handleRemoveParticipant = (friendIdToRemove) => {
-        setCurrentParticipants(
-            currentParticipants.filter(p => p.friendId !== friendIdToRemove)
-        );
+        setCurrentParticipants(currentParticipants.filter(p => p.friendId !== friendIdToRemove));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!driverId || !carId || !totalKms) {
-            alert("Please fill out all trip details.");
-            return;
-        }
-
+        if (!driverId || !carId) return alert("Please select a driver and a car.");
         const payload = {
-            date,
-            total_kms: parseFloat(totalKms),
-            driver_id: parseInt(driverId),
-            car_id: parseInt(carId),
-            participants: currentParticipants.map(p => ({
-                friend_id: p.friendId,
-                direction: p.direction,
-            })),
+            date, total_kms: parseFloat(totalKms), driver_id: parseInt(driverId), car_id: parseInt(carId),
+            participants: currentParticipants.map(p => ({ friend_id: p.friendId, direction: p.direction })),
         };
-
         try {
             const response = await fetch(`${API_URL}/trips`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
             });
             if (response.ok) {
-                setTotalKms("");
-                setDriverId("");
-                setCarId("");
-                setCurrentParticipants([]);
-                onTripAdded();
+                setTotalKms(""); setDriverId(""); setCarId(""); setCurrentParticipants([]); onTripAdded();
             } else {
                 const errorData = await response.json();
                 alert("Error: " + errorData.message);
             }
         } catch (err) {
-            alert("Something went wrong: " + err.message);
+            alert("Something went wrong: Failed to fetch");
         }
     };
 
@@ -79,7 +57,6 @@ const TripForm = ({ friends, cars, onTripAdded }) => {
                 <label>Total Kilometers</label>
                 <input type="number" placeholder="e.g., 50" value={totalKms} onChange={(e) => setTotalKms(e.target.value)} min="0" step="0.1" required />
             </div>
-
             <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>
                     <label>Car Used</label>
@@ -96,7 +73,6 @@ const TripForm = ({ friends, cars, onTripAdded }) => {
                     </select>
                 </div>
             </div>
-
             <div className="participants-section">
                 <h3>Participants</h3>
                 <div className="add-participant-controls">
@@ -124,5 +100,4 @@ const TripForm = ({ friends, cars, onTripAdded }) => {
         </form>
     );
 };
-
 export default TripForm;

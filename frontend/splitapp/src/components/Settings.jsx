@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 const Settings = ({ petrolPrice, onPriceChanged }) => {
     const [price, setPrice] = useState(petrolPrice);
-    const API_URL = "http://127.0.0.1:5000";
+    const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
 
     useEffect(() => {
         setPrice(petrolPrice);
@@ -23,7 +23,7 @@ const Settings = ({ petrolPrice, onPriceChanged }) => {
                 alert('Error: ' + errorData.message);
             }
         } catch (err) {
-            alert('Something went wrong: ' + err.message);
+            alert('Something went wrong: Failed to fetch');
         }
     };
 
@@ -32,17 +32,10 @@ const Settings = ({ petrolPrice, onPriceChanged }) => {
             <h2>⛽ Petrol Price</h2>
             <div className="price-control">
                 <span>₹</span>
-                <input
-                    type="number"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    min="0"
-                    step="0.01"
-                />
+                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} min="0" step="0.01" />
                 <button onClick={handleUpdatePrice}>Update</button>
             </div>
         </div>
     );
 };
-
 export default Settings;
