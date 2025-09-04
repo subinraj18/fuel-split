@@ -7,6 +7,7 @@ import CarManager from "./components/CarManager";
 import Settings from "./components/Settings";
 import BalanceDashboard from "./components/BalanceDashboard";
 import ExpenseReport from "./components/ExpenseReport";
+import TripBreakdown from "./components/TripBreakdown";
 import "./App.css";
 
 function App() {
@@ -63,7 +64,8 @@ function App() {
           <TripList trips={trips} />
         </div>
         <div className="right-panel">
-          <BalanceDashboard trips={trips} onDataChanged={handleDataChanged} />
+          {/* 2. Replace BalanceDashboard with the new TripBreakdown component */}
+          <TripBreakdown trips={trips} onDataChanged={handleDataChanged} />
           <ExpenseReport />
           <Settings petrolPrice={petrolPrice} onPriceChanged={handleDataChanged} />
           <CarManager cars={cars} onCarsChanged={handleDataChanged} />

@@ -260,3 +260,47 @@ def get_monthly_expenses():
     expense_list = [{"name": name, "amount": round(
         amount, 2)} for name, amount in expenses.items()]
     return jsonify(sorted(expense_list, key=lambda x: x['amount'], reverse=True)), 200
+
+
+@app.route("/latest-trip-breakdown", methods=["GET"])
+def get_latest_trip_breakdown():
+    # Find the most recent trip
+    latest_trip = Trip.query.order_by(Trip.id.desc()).first()
+
+    if not latest_trip:
+        return jsonify({"message": "No trips found"}), 404
+
+    # --- Calculation for this single trip ---
+    all_involved = list(latest_trip.participants)
+    driver_is_participant = any(
+        p.friend_id == latest_trip.driver_id for p in all_involved)
+
+    # Ensure the driver is always included in the cost split
+    if not driver_is_participant:
+        driver_participation = SimpleNamespace(
+            friend_id=latest_trip.driver_id, direction='round', friend=latest_trip.driver)
+        all_involved.append(driver_participation)
+
+    total_weight = sum(direction_weight(p.direction) for p in all_involved)
+
+    if total_weight == 0:
+        # Avoid division by zero if there are no participants
+        return jsonify({"trip": latest_trip.to_json(), "breakdown": []}), 200
+
+    cost_per_share = latest_trip.total_cost / total_weight
+
+    breakdown = []
+    for p in all_involved:
+        share_cost = direction_weight(p.direction) * cost_per_share
+        breakdown.append({
+            "name": p.friend.name,
+            "share": round(share_cost, 2)
+        })
+
+    # Prepare the final response payload
+    response_data = {
+        "trip": latest_trip.to_json(),
+        "breakdown": breakdown
+    }
+
+    return jsonify(response_data), 200
