@@ -304,3 +304,20 @@ def get_latest_trip_breakdown():
     }
 
     return jsonify(response_data), 200
+
+
+@app.route("/cars/<int:car_id>", methods=["DELETE"])
+def delete_car(car_id):
+    car = Car.query.get(car_id)
+    if not car:
+        return jsonify({"message": "car not found"}), 404
+
+    # Check if the car is used in any trips before deleting
+    is_car_used = Trip.query.filter_by(car_id=car_id).first()
+    if is_car_used:
+        # 409 Conflict
+        return jsonify({"message": "Cannot delete this car because it is used in existing trips."}), 409
+
+    db.session.delete(car)
+    db.session.commit()
+    return jsonify({"message": "deleted"}), 200

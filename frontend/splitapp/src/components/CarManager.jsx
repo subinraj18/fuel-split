@@ -7,6 +7,7 @@ const CarManager = ({ cars, onCarsChanged }) => {
 
     const handleAddCar = async (e) => {
         e.preventDefault();
+        // ... (this function remains the same)
         if (!name.trim() || !mileage.trim()) return;
         try {
             const response = await fetch(`${API_URL}/cars`, {
@@ -27,21 +28,44 @@ const CarManager = ({ cars, onCarsChanged }) => {
         }
     };
 
+    // --- NEW: Function to handle car deletion ---
+    const handleDeleteCar = async (carId) => {
+        // Confirm before deleting
+        if (!window.confirm("Are you sure you want to delete this car?")) return;
+
+        try {
+            const response = await fetch(`${API_URL}/cars/${carId}`, { method: 'DELETE' });
+            if (response.ok) {
+                onCarsChanged(); // Refresh the list of cars
+            } else {
+                const errorData = await response.json();
+                alert('Failed to delete car: ' + errorData.message);
+            }
+        } catch (err) {
+            alert('Something went wrong: Failed to fetch');
+        }
+    };
+
     return (
-        <div className="card"> {/* Changed className */}
+        <div className="card">
             <h2>🚗 Manage Cars</h2>
             <form onSubmit={handleAddCar} style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                 <input type="text" placeholder="Car Name (e.g., My Bike)" value={name} onChange={(e) => setName(e.target.value)} required style={{ flex: 1 }} />
                 <input type="number" placeholder="Mileage (km/l)" value={mileage} onChange={(e) => setMileage(e.target.value)} min="0" step="0.1" required style={{ flex: 1 }} />
-                {/* --- Styled Button --- */}
                 <button type="submit" className="btn btn-primary">
                     Add Car
                 </button>
             </form>
-            <ul className="item-list"> {/* Changed className */}
+            <ul className="item-list">
                 {cars.map(car => (
                     <li key={car.id}>
-                        {car.name} <span>({car.mileage} km/l)</span>
+                        <div> {/* Wrap text in a div to align properly */}
+                            {car.name} <span style={{ color: 'var(--text-secondary)' }}>({car.mileage} km/l)</span>
+                        </div>
+                        {/* --- NEW: Delete button --- */}
+                        <button onClick={() => handleDeleteCar(car.id)} className="remove-btn">
+                            &times;
+                        </button>
                     </li>
                 ))}
             </ul>
