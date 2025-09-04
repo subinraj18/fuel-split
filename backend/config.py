@@ -2,7 +2,7 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 # This line checks for the live database URL provided by Render
 database_url = os.environ.get("DATABASE_URL")
@@ -15,7 +15,7 @@ if database_url and database_url.startswith("postgres://"):
 # IF the database_url exists (on Render), use it.
 # ELSE (on your local computer), use the sqlite file.
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///" + \
-    os.path.join(os.path.abspath(os.path.dirname(_file_)), "splitapp.db")
+    os.path.join(os.path.abspath(os.path.dirname(__file__)), "splitapp.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
