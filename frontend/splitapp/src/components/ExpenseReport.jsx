@@ -24,18 +24,21 @@ const ExpenseReport = () => {
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
     return (
-        <div className="expense-report">
+        <div className="card"> {/* Changed className */}
             <h2>📊 Monthly Expense Report</h2>
-            <div className="report-controls">
+            <div className="report-controls" style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                 <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
                     {monthNames.map((name, index) => (<option key={index} value={index + 1}>{name}</option>))}
                 </select>
                 <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
                     {years.map(year => (<option key={year} value={year}>{year}</option>))}
                 </select>
-                <button onClick={fetchExpenses} disabled={isLoading}>{isLoading ? 'Loading...' : 'Generate'}</button>
+                {/* --- Styled Button --- */}
+                <button onClick={fetchExpenses} disabled={isLoading} className="btn btn-primary">
+                    {isLoading ? 'Loading...' : 'Generate'}
+                </button>
             </div>
-            <ul className="report-results">
+            <ul className="item-list"> {/* Changed className */}
                 {expenses.map(exp => (
                     <li key={exp.name}>
                         <strong>{exp.name}</strong>

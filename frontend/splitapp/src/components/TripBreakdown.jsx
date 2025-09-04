@@ -36,7 +36,7 @@ const TripBreakdown = ({ onDataChanged, trips }) => {
     }, [trips, API_URL]);
 
     return (
-        <div className="balance-dashboard"> {/* We can reuse the same CSS class */}
+        <div className="card"> {/* Changed className */}
             <h2>📊 Last Trip Breakdown</h2>
             {isLoading ? (
                 <p>Loading...</p>
@@ -44,17 +44,17 @@ const TripBreakdown = ({ onDataChanged, trips }) => {
                 <p>Add a trip to see the breakdown.</p>
             ) : (
                 <div>
-                    <p>
+                    <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
                         <strong>Date:</strong> {breakdown.trip.date} | <strong>Driver:</strong> {breakdown.trip.driver.name}
                         <br />
-                        <strong>Total Cost:</strong> ₹{breakdown.trip.total_cost.toFixed(2)}
+                        <strong>Total Cost:</strong> <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>₹{breakdown.trip.total_cost.toFixed(2)}</span>
                     </p>
                     <strong>Cost per person:</strong>
-                    <ul>
+                    <ul className="item-list" style={{ marginTop: '10px' }}> {/* Changed className */}
                         {breakdown.breakdown.map((item, index) => (
                             <li key={index}>
                                 {item.name}
-                                <span>₹{item.share.toFixed(2)}</span>
+                                <span style={{ color: 'var(--primary-green)', fontWeight: '600' }}>₹{item.share.toFixed(2)}</span>
                             </li>
                         ))}
                     </ul>
@@ -63,5 +63,4 @@ const TripBreakdown = ({ onDataChanged, trips }) => {
         </div>
     );
 };
-
 export default TripBreakdown;

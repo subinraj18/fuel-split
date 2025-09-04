@@ -28,12 +28,15 @@ const Settings = ({ petrolPrice, onPriceChanged }) => {
     };
 
     return (
-        <div className="settings">
+        <div className="card"> {/* Changed className */}
             <h2>⛽ Petrol Price</h2>
-            <div className="price-control">
-                <span>₹</span>
-                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} min="0" step="0.01" />
-                <button onClick={handleUpdatePrice}>Update</button>
+            <div className="price-control" style={{ display: 'flex', gap: '10px' }}>
+                <span style={{ fontSize: '1.5rem', alignSelf: 'center' }}>₹</span>
+                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} min="0" step="0.01" style={{ flex: 1 }} />
+                {/* --- Styled Button --- */}
+                <button onClick={handleUpdatePrice} className="btn btn-primary">
+                    Update
+                </button>
             </div>
         </div>
     );

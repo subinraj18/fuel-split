@@ -4,14 +4,18 @@
     align-items: center;
     height: 100vh;
     width: 100vw;
-    background-color: #f8f9fa;
+    background-color: var(--background-dark);
+    /* Use CSS variable */
 }
 
 .login-box {
     padding: 40px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background: var(--card-dark);
+    /* Use CSS variable */
+    border-radius: 16px;
+    /* Larger radius */
+    border: 1px solid var(--border-color);
+    /* Add border */
     text-align: center;
     width: 320px;
 }
@@ -23,11 +27,14 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
+    color: var(--text-primary);
+    /* Use CSS variable */
 }
 
 .login-box p {
     margin-bottom: 20px;
-    color: #666;
+    color: var(--text-secondary);
+    /* Use CSS variable */
 }
 
 .login-form {
@@ -39,23 +46,32 @@
 .login-form input {
     width: 100%;
     padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    /* Use CSS variable */
+    border-radius: 8px;
+    /* Match app style */
     font-size: 1rem;
     box-sizing: border-box;
+    background-color: var(--background-dark);
+    /* Use CSS variable */
+    color: var(--text-primary);
+    /* Use CSS variable */
 }
 
 .login-form button {
     padding: 12px;
-    border-radius: 5px;
+    border-radius: 8px;
     border: none;
-    background-color: #5c67f2;
-    color: white;
+    background-color: var(--primary-green);
+    /* Use CSS variable */
+    color: #000;
+    /* Black text on green button */
     font-size: 1.1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: filter 0.2s;
 }
 
 .login-form button:hover {
-    background-color: #4a54c4;
+    filter: brightness(0.9);
 }
