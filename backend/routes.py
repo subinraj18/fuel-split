@@ -4,16 +4,6 @@ from models import Friend, Trip, Participation, Car, Setting, Payment
 from collections import defaultdict
 from datetime import datetime
 
-
-@app.route("/create-tables")
-def create_tables():
-    try:
-        db.create_all()
-        return "Tables created successfully!", 200
-    except Exception as e:
-        return f"An error occurred: {e}", 500
-
-
 # --- Helper Functions ---
 ALLOWED_DIRECTIONS = {"round", "morning", "evening"}
 

@@ -14,8 +14,6 @@ function App() {
   const [cars, setCars] = useState([]);
   const [petrolPrice, setPetrolPrice] = useState(0);
 
-  // This is the corrected line. It uses the Vercel variable when deployed,
-  // but falls back to localhost for local development.
   const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
 
   const fetchData = useCallback(async (endpoint, setter) => {
@@ -31,7 +29,7 @@ function App() {
     } catch (err) {
       console.error(`Error fetching ${endpoint}:`, err);
     }
-  }, [API_URL]); // Add API_URL as a dependency
+  }, [API_URL]);
 
   const handleDataChanged = useCallback(() => {
     fetchData("trips", setTrips);
