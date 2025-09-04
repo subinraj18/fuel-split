@@ -28,14 +28,17 @@ const CarManager = ({ cars, onCarsChanged }) => {
     };
 
     return (
-        <div className="car-manager">
+        <div className="card"> {/* Changed className */}
             <h2>🚗 Manage Cars</h2>
-            <form onSubmit={handleAddCar} className="add-car-form">
-                <input type="text" placeholder="Car Name (e.g., My Bike)" value={name} onChange={(e) => setName(e.target.value)} required />
-                <input type="number" placeholder="Mileage (km/l)" value={mileage} onChange={(e) => setMileage(e.target.value)} min="0" step="0.1" required />
-                <button type="submit">Add Car</button>
+            <form onSubmit={handleAddCar} style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                <input type="text" placeholder="Car Name (e.g., My Bike)" value={name} onChange={(e) => setName(e.target.value)} required style={{ flex: 1 }} />
+                <input type="number" placeholder="Mileage (km/l)" value={mileage} onChange={(e) => setMileage(e.target.value)} min="0" step="0.1" required style={{ flex: 1 }} />
+                {/* --- Styled Button --- */}
+                <button type="submit" className="btn btn-primary">
+                    Add Car
+                </button>
             </form>
-            <ul className="car-list">
+            <ul className="item-list"> {/* Changed className */}
                 {cars.map(car => (
                     <li key={car.id}>
                         {car.name} <span>({car.mileage} km/l)</span>
