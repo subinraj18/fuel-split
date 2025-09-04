@@ -1,9 +1,9 @@
 from config import app, db
 from flask_cors import CORS
-import routes  # This registers the routes from routes.py
+import routes
 
-# Enable Cross-Origin Resource Sharing (CORS) for the app
-CORS(app)
+# This is a more explicit CORS configuration that should solve the issue
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 if __name__ == "__main__":
     with app.app_context():
