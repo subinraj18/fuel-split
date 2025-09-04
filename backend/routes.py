@@ -3,6 +3,7 @@ from config import app, db
 from models import Friend, Trip, Participation, Car, Setting, Payment
 from collections import defaultdict
 from datetime import datetime
+from types import SimpleNamespace
 
 # --- Helper Functions ---
 ALLOWED_DIRECTIONS = {"round", "morning", "evening"}
@@ -169,36 +170,54 @@ def create_payment():
 # --- Calculation Routes ---
 
 
-# Corrected code for backend/routes.py
 @app.route("/balances", methods=["GET"])
 def get_balances():
     balances = defaultdict(float)
     friends = {f.id: f for f in Friend.query.all()}
 
-    # This part was correct: Calculate balances from trips
     for trip in Trip.query.all():
-        if not trip.participants:
-            continue
-        total_weight = sum(direction_weight(p.direction)
-                           for p in trip.participants)
+        # Create a temporary list of all people involved in the cost-sharing
+        all_involved = list(trip.participants)
+
+        # Check if the driver is already listed as a participant
+        driver_is_participant = any(
+            p.friend_id == trip.driver_id for p in all_involved)
+
+        # If the driver is not in the participants list, add them.
+        # This ensures the driver's share is always included in the calculation.
+        # We assume the driver's participation is a 'round' trip.
+        if not driver_is_participant:
+            driver_participation = SimpleNamespace(
+                friend_id=trip.driver_id, direction='round')
+            all_involved.append(driver_participation)
+
+        # Calculate total weight based on everyone involved (driver + participants)
+        total_weight = sum(direction_weight(p.direction) for p in all_involved)
+
         if total_weight == 0:
             continue
+
         cost_per_share = trip.total_cost / total_weight
+
+        # Credit the driver for paying the full amount upfront
         balances[trip.driver_id] += trip.total_cost
-        for p in trip.participants:
+
+        # Debit each person for their respective share
+        for p in all_involved:
             balances[p.friend_id] -= direction_weight(
                 p.direction) * cost_per_share
 
-    # --- This is the corrected payment logic ---
+    # Process any payments that have been made
     for payment in Payment.query.all():
-        balances[payment.from_friend_id] -= payment.amount
-        balances[payment.to_friend_id] += payment.amount
+        balances[payment.from_friend_id] += payment.amount
+        balances[payment.to_friend_id] -= payment.amount
 
-    # Using a small tolerance for floating point inaccuracies
+    # Filter into debtors and creditors, ignoring negligible amounts
     debtors = {id: b for id, b in balances.items() if b < -0.01}
     creditors = {id: b for id, b in balances.items() if b > 0.01}
 
     debts = []
+    # Settle debts between debtors and creditors
     for debtor_id, debtor_balance in sorted(debtors.items()):
         amount_owed = abs(debtor_balance)
         for creditor_id, creditor_balance in sorted(creditors.items()):
@@ -206,6 +225,7 @@ def get_balances():
                 break
             if creditor_balance <= 0.01:
                 continue
+
             can_pay = min(amount_owed, creditor_balance)
             debts.append({
                 "from_id": debtor_id, "from_name": friends[debtor_id].name,
