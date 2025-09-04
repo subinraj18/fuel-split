@@ -1,5 +1,18 @@
+/* Define the new color palette as CSS variables */
+:root {
+  --background-dark: #1A1D1F;
+  --card-dark: #202426;
+  --primary-green: #A8F49C;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A7A7A7;
+  --border-color: #33383B;
+  --danger-red: #e53e3e;
+}
+
 body {
   margin: 0;
   padding: 0;
-  background-color: #f8f9fa;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--background-dark);
+  color: var(--text-primary);
 }

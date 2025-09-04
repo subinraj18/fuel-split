@@ -40,13 +40,13 @@ const FriendManager = ({ friends, onFriendsChanged }) => {
     };
 
     return (
-        <div className="friend-manager">
+        <div className="card"> {/* Changed className */}
             <h2>🧑‍🤝‍🧑 Manage Friends</h2>
-            <form onSubmit={handleAddFriend} className="add-friend-form">
-                <input type="text" placeholder="Enter friend's name" value={name} onChange={(e) => setName(e.target.value)} required />
-                <button type="submit">Add Friend</button>
+            <form onSubmit={handleAddFriend} style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+                <input type="text" placeholder="Enter friend's name" value={name} onChange={(e) => setName(e.target.value)} required style={{ flex: 1 }} />
+                <button type="submit" className="btn btn-secondary">Add Friend</button> {/* Changed className */}
             </form>
-            <ul className="friend-list">
+            <ul className="item-list"> {/* Changed className */}
                 {friends.map(friend => (
                     <li key={friend.id}>
                         {friend.name}

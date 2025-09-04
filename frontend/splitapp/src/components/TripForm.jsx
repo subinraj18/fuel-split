@@ -51,53 +51,60 @@ const TripForm = ({ friends, cars, onTripAdded }) => {
     const availableFriends = friends.filter(f => !currentParticipants.some(p => p.friendId === f.id));
 
     return (
-        <form className="trip-form" onSubmit={handleSubmit}>
+        <div className="card"> {/* Changed className */}
             <h2>Add New Trip</h2>
-            <div className="form-group">
-                <label>Total Kilometers</label>
-                <input type="number" placeholder="e.g., 50" value={totalKms} onChange={(e) => setTotalKms(e.target.value)} min="0" step="0.1" required />
-            </div>
-            <div className="form-row">
-                <div className="form-group" style={{ flex: 1 }}>
-                    <label>Car Used</label>
-                    <select value={carId} onChange={e => setCarId(e.target.value)} required>
-                        <option value="">-- Select a car --</option>
-                        {cars.map(car => (<option key={car.id} value={car.id}>{car.name}</option>))}
-                    </select>
+            <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                    <label>Total Kilometers</label>
+                    <input type="number" placeholder="e.g., 50" value={totalKms} onChange={(e) => setTotalKms(e.target.value)} min="0" step="0.1" required />
                 </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                    <label>Driver (Who Paid?)</label>
-                    <select value={driverId} onChange={e => setDriverId(e.target.value)} required>
-                        <option value="">-- Select a driver --</option>
-                        {friends.map(friend => (<option key={friend.id} value={friend.id}>{friend.name}</option>))}
-                    </select>
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>Car Used</label>
+                        <select value={carId} onChange={e => setCarId(e.target.value)} required>
+                            <option value="">-- Select a car --</option>
+                            {cars.map(car => (<option key={car.id} value={car.id}>{car.name}</option>))}
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Driver (Who Paid?)</label>
+                        <select value={driverId} onChange={e => setDriverId(e.target.value)} required>
+                            <option value="">-- Select a driver --</option>
+                            {friends.map(friend => (<option key={friend.id} value={friend.id}>{friend.name}</option>))}
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div className="participants-section">
-                <h3>Participants</h3>
-                <div className="add-participant-controls">
-                    <select value={selectedFriendId} onChange={(e) => setSelectedFriendId(e.target.value)}>
-                        <option value="">-- Select a friend --</option>
-                        {availableFriends.map(friend => (<option key={friend.id} value={friend.id}>{friend.name}</option>))}
-                    </select>
-                    <select value={selectedDirection} onChange={(e) => setSelectedDirection(e.target.value)}>
-                        <option value="round">Two Way</option>
-                        <option value="morning">One Way (Morning)</option>
-                        <option value="evening">One Way (Evening)</option>
-                    </select>
-                    <button type="button" onClick={handleAddParticipant}>Add</button>
+
+                <div className="form-group">
+                    <label>Participants</label>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <select value={selectedFriendId} onChange={(e) => setSelectedFriendId(e.target.value)} style={{ flex: 2 }}>
+                            <option value="">-- Select a friend --</option>
+                            {availableFriends.map(friend => (<option key={friend.id} value={friend.id}>{friend.name}</option>))}
+                        </select>
+                        <select value={selectedDirection} onChange={(e) => setSelectedDirection(e.target.value)} style={{ flex: 1 }}>
+                            <option value="round">Two Way</option>
+                            <option value="morning">One Way (Morning)</option>
+                            <option value="evening">One Way (Evening)</option>
+                        </select>
+                        <button type="button" onClick={handleAddParticipant} className="btn btn-secondary">Add</button> {/* Changed className */}
+                    </div>
                 </div>
-                <ul className="participant-preview-list">
-                    {currentParticipants.map(p => (
-                        <li key={p.friendId}>
-                            <span>{p.name} ({p.direction === 'round' ? 'Two Way' : 'One Way'})</span>
-                            <button type="button" onClick={() => handleRemoveParticipant(p.friendId)} className="remove-btn">&times;</button>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <button type="submit" className="save-trip-btn">Save Trip</button>
-        </form>
+
+                {currentParticipants.length > 0 && (
+                    <ul className="item-list" style={{ marginBottom: '20px' }}>
+                        {currentParticipants.map(p => (
+                            <li key={p.friendId}>
+                                <span>{p.name} ({p.direction === 'round' ? 'Two Way' : 'One Way'})</span>
+                                <button type="button" onClick={() => handleRemoveParticipant(p.friendId)} className="remove-btn">&times;</button>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+
+                <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Save Trip</button> {/* Changed className */}
+            </form>
+        </div>
     );
 };
 export default TripForm;

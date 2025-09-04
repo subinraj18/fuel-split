@@ -66,7 +66,7 @@ function App() {
   // Once authenticated, show the main application
   return (
     <div className="app">
-      <h1>🚗 FuelFlow</h1>
+      <h1>FuelFlow</h1>
       <div className="main-content">
         <div className="left-panel">
           <TripForm friends={friends} cars={cars} onTripAdded={fetchData} />
