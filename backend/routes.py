@@ -4,6 +4,7 @@ from models import Friend, Trip, Participation, Car, Setting, Payment
 from collections import defaultdict
 from datetime import datetime
 from types import SimpleNamespace
+from ml_model import train_and_predict
 
 # --- Helper Functions ---
 ALLOWED_DIRECTIONS = {"round", "morning", "evening"}
@@ -322,3 +323,26 @@ def delete_car(car_id):
     db.session.commit()
     return jsonify({"message": "deleted"}), 200
 # Add this function to your backend/routes.py file
+
+
+@app.route("/predict-cost", methods=["GET"])
+def predict_cost():
+    # Get the kilometers from the query parameter (e.g., /predict-cost?kms=100)
+    kms = request.args.get("kms", type=float)
+
+    if kms is None or kms <= 0:
+        return jsonify({"error": "A positive number for kms is required."}), 400
+
+    # Call our ML function
+    prediction = train_and_predict(kms)
+
+    if prediction is None:
+        return jsonify({
+            "prediction": None,
+            "message": "Not enough trip data to make a prediction. Log at least two trips."
+        }), 200
+
+    return jsonify({
+        "prediction": round(prediction, 2),
+        "message": "Prediction successful."
+    }), 200

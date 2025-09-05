@@ -7,10 +7,11 @@ import CarManager from "./components/CarManager";
 import Settings from "./components/Settings";
 import ExpenseReport from "./components/ExpenseReport";
 import TripBreakdown from "./components/TripBreakdown";
+import CostPredictor from "./components/CostPredictor";
 import "./App.css";
 
 function App() {
-  // State to track if the user is authenticated
+  // State for authentication
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // State for application data
@@ -42,14 +43,12 @@ function App() {
     }
   }, [API_URL]);
 
-  // This hook will fetch data ONLY after the user is authenticated
   useEffect(() => {
     if (isAuthenticated) {
       fetchData();
     }
   }, [isAuthenticated, fetchData]);
 
-  // This function handles the password submission from the Login component
   const handleLogin = (password) => {
     if (password === "fuel") {
       setIsAuthenticated(true);
@@ -58,12 +57,12 @@ function App() {
     }
   };
 
-  // If the user is not authenticated, show only the Login page
+  // If not authenticated, render the Login screen
   if (!isAuthenticated) {
     return <Login onLogin={handleLogin} />;
   }
 
-  // Once authenticated, show the main application
+  // Once authenticated, render the main application with the correct layout
   return (
     <div className="app">
       <h1>FuelFlow</h1>
@@ -73,6 +72,7 @@ function App() {
           <TripList trips={trips} />
         </div>
         <div className="right-panel">
+          <CostPredictor />
           <TripBreakdown trips={trips} onDataChanged={fetchData} />
           <ExpenseReport />
           <Settings petrolPrice={petrolPrice} onPriceChanged={fetchData} />
