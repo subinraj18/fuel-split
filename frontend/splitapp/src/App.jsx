@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
+// --- Import All Your Components ---
 import Login from "./components/Login";
 import TripForm from "./components/TripForm";
 import TripList from "./components/TripList";
 import FriendManager from "./components/FriendManager";
 import CarManager from "./components/CarManager";
 import Settings from "./components/Settings";
-import ExpenseReport from "./components/ExpenseReport";
+import AnalyticsDashboard from "./components/AnalyticsDashboard";
 import TripBreakdown from "./components/TripBreakdown";
 import CostPredictor from "./components/CostPredictor";
 import "./App.css";
@@ -74,7 +75,7 @@ function App() {
         <div className="right-panel">
           <CostPredictor />
           <TripBreakdown trips={trips} onDataChanged={fetchData} />
-          <ExpenseReport />
+          <AnalyticsDashboard />
           <Settings petrolPrice={petrolPrice} onPriceChanged={fetchData} />
           <CarManager cars={cars} onCarsChanged={fetchData} />
           <FriendManager friends={friends} onFriendsChanged={fetchData} />

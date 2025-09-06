@@ -5,6 +5,8 @@ from collections import defaultdict
 from datetime import datetime
 from types import SimpleNamespace
 from ml_model import train_and_predict
+from sqlalchemy import func
+from models import Trip, Participation, Car, Friend
 
 # --- Helper Functions ---
 ALLOWED_DIRECTIONS = {"round", "morning", "evening"}
@@ -346,3 +348,67 @@ def predict_cost():
         "prediction": round(prediction, 2),
         "message": "Prediction successful."
     }), 200
+
+
+@app.route("/analytics/expenses_by_friend", methods=["GET"])
+def expenses_by_friend():
+    """
+    Calculates the total fuel cost incurred by each friend,
+    with an optional filter for a specific year and month.
+    """
+    # Get optional year and month from the request URL
+    year, month = request.args.get("year"), request.args.get("month")
+
+    # Start with a query for all trips
+    query = Trip.query
+
+    # If year and month are provided, filter the trips
+    if year and month:
+        date_prefix = f"{year}-{int(month):02d}"
+        query = query.filter(Trip.date.startswith(date_prefix))
+
+    trips = query.all()
+
+    expenses = defaultdict(float)
+
+    for trip in trips:
+        if not trip.participants:
+            continue
+
+        total_weight = sum(direction_weight(p.direction)
+                           for p in trip.participants)
+        if total_weight == 0:
+            continue
+
+        cost_per_share = trip.total_cost / total_weight
+
+        for p in trip.participants:
+            friend_name = p.friend.name
+            expenses[friend_name] += direction_weight(
+                p.direction) * cost_per_share
+
+    sorted_expenses = sorted(
+        expenses.items(), key=lambda item: item[1], reverse=True)
+
+    labels = [friend[0] for friend in sorted_expenses]
+    data = [round(friend[1], 2) for friend in sorted_expenses]
+
+    return jsonify({"labels": labels, "data": data})
+
+
+@app.route("/analytics/car_usage", methods=["GET"])
+def car_usage():
+    """
+    Counts how many trips each car has been used for.
+    """
+    usage_data = db.session.query(
+        Car.name,
+        func.count(Trip.id).label('trip_count')
+    ).join(Trip, Car.id == Trip.car_id)\
+     .group_by(Car.name)\
+     .order_by(func.count(Trip.id).desc()).all()
+
+    labels = [row.name for row in usage_data]
+    data = [row.trip_count for row in usage_data]
+
+    return jsonify({"labels": labels, "data": data})
